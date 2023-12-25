@@ -1,0 +1,44 @@
+# Name : Boyuan Chen
+# ID : 2200017816
+
+    .pos 0
+    irmovq stack, %rsp   #set up stack pointer
+    call main            #Execute main program
+    halt                 #Terminate
+
+#Linked List
+    .align 8
+ele1:
+    .quad 0x00a
+    .quad ele2
+ele2:
+    .quad 0x0b0
+    .quad ele3
+ele3:
+    .quad 0xc00
+    .quad 0
+
+main:
+    irmovq ele1, %rdi    #read first element : ele1
+    call sum_list
+    ret
+
+#start in %rdi
+
+sum_list:
+    xorq %rax, %rax      #sum=0
+    jmp test
+
+loop:
+    mrmovq (%rdi), %rsi
+    addq %rsi, %rax
+    mrmovq 8(%rdi), %rdi  #lead to next linked value
+
+test:
+    andq %rdi, %rdi
+    jne loop
+    ret
+
+    .pos 0x200 
+stack:
+

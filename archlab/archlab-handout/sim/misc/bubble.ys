@@ -1,0 +1,88 @@
+# Name : Boyuan Chen
+# ID : 2200017816
+
+    .pos 0
+    irmovq stack, %rsp   #set up stack pointer
+    call main            #Execute main program
+    halt                 #Terminate
+
+    .align 8
+
+Array:
+    .quad 0xbca
+    .quad 0xcba
+    .quad 0xacb
+    .quad 0xcab
+    .quad 0xabc
+    .quad 0xbac
+
+main:
+    irmovq Array,%rdi #put array in the register
+    irmovq $3,%rsi
+    call bubble_sort
+    ret
+
+#data in %rdi , count in %rsi
+bubble_sort:
+    pushq %r8        # last in %r8
+    pushq %r9        # outer cycle judge 
+    pushq %r10       # i in %r10
+    pushq %r11       #inner cycle judge: i < last
+    pushq %r12        # temp  *(i+1)
+    pushq %r13       #judge *(i+1)<*i
+    pushq %r14       # constant 8
+    irmovq $8,%r14   #constant 8 ,namely ++ -- 1
+    rrmovq %rdi,%r8  #last in %r8
+
+    #calculate count
+    addq %rsi,%rsi
+    addq %rsi,%rsi
+    addq %rsi,%rsi
+    addq %rsi,%rsi
+    subq %r14,%rsi
+    addq %rsi,%r8    #last=data + count - 1
+
+L1:
+    rrmovq %r8,%r9  #move %r8 to %r9 for judgement
+    subq  %rdi,%r9  #judge recursive components
+    jle  test       #Terminate
+    rrmovq %rdi, %r10 #i in %r10
+
+L2:
+    rrmovq %r8,%r11
+    subq   %r10,%r11
+    jle  L3
+    mrmovq (%r10),%r11   #*i
+    mrmovq 8(%r10),%r12  #*(i+1)
+    rrmovq %r11,%r13
+    subq   %r12,%r13    #judge *(i+1)<*(i)
+
+    jle L4 #inner cycle
+    rrmovq  %r12,%r13    #%r13=t
+    rmmovq  %r11,8(%r10) #change *i
+    rmmovq  %r13,(%r10)  #change i
+
+
+#inner cycle
+L4:
+    addq %r14,%r10  #i++
+    jmp L2  #return inner cycle
+
+#outer  cycle
+L3:
+    subq %r14,%r8  #last--
+    jmp  L1
+
+
+test:
+    popq %r14
+    popq %r13
+    popq %r12
+    popq %r11
+    popq %r10
+    popq %r9
+    popq %r8
+    ret
+
+    .pos 0x200
+stack:
